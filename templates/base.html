@@ -1,0 +1,260 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Project Forage{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/globals.css' %}">
+    <link rel="stylesheet" href="{% static 'css/chatbot.css' %}">
+    <!-- Marked.js for AI Markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="mesh-bg"></div>
+    <div style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+        <button id="theme-toggle" class="btn-secondary" style="padding: 8px 12px; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+            <span id="theme-icon">🌓</span>
+        </button>
+    </div>
+    <style>
+        #loader-screen {
+            position: fixed;
+            top: 0;
+            left: 0; 
+            width: 100%;
+            height: 100%;
+            background: #f8fafc; /* FIXED LIGHT BG */
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.9s cubic-bezier(0.65, 0, 0.35, 1);
+            overflow: hidden;
+        }
+
+        #loader-screen::before {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background: radial-gradient(circle at center, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
+            animation: pulseBg 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes pulseBg {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+
+        #loader-screen.hidden {
+            opacity: 0;
+            transform: scale(1.1);
+            filter: blur(10px);
+            visibility: hidden;
+        }
+
+        .loader-content {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            width: 100%;
+            height: 100%;
+            gap: 40px;
+        }
+
+        .loader-title {
+            font-size: clamp(1.8rem, 6vw, 3rem);
+            font-weight: 800;
+            background: linear-gradient(90deg, #0f172a 0%, #3b82f6 50%, #0f172a 100%); /* FIXED LIGHT TEXT COLORS */
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s linear infinite;
+            letter-spacing: -0.04em;
+            margin: 0;
+        }
+
+        @keyframes shimmer {
+            to { background-position: 200% center; }
+        }
+
+        .loader-stats {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3.5rem; /* Slightly smaller for better fit */
+            color: #0f172a; /* FIXED DARK TEXT ON LIGHT BG */
+            font-weight: 800;
+            opacity: 1;
+            letter-spacing: -0.02em;
+            text-shadow: 0 0 40px rgba(59, 130, 246, 0.2);
+            line-height: 1;
+            margin: 20px 0;
+        }
+
+        .loader-bar-container {
+            width: 80%;
+            max-width: 300px;
+            height: 4px;
+            background: rgba(59, 130, 246, 0.05); /* FIXED LIGHT BLUE BG */
+            border-radius: 100px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 480px) {
+            .loader-stats {
+                font-size: 2.5rem;
+            }
+            .loader-content {
+                gap: 24px !important;
+            }
+        }
+
+        #loader-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #3b82f6, #a855f7);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+            transition: width 0.15s cubic-bezier(0.1, 0.7, 0.1, 1);
+            position: relative;
+        }
+
+        #loader-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: barGlow 2s infinite;
+        }
+
+        @keyframes barGlow {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Staggered Reveal Animation */
+        .reveal-item {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .reveal-item.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #main-content {
+            opacity: 1; /* Handle via stagger children */
+            display: none; /* Controlled by JS transition */
+        }
+    </style>
+
+    <div id="loader-screen">
+        <div class="loader-content">
+            <h1 class="loader-title">Project Forage</h1>
+            <div class="loader-stats"><span id="loader-percentage">0</span>%</div>
+            <div class="loader-bar-container">
+                <div id="loader-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <main id="main-content" class="container" style="max-width: 800px; margin: 0 auto; padding: 40px 20px;">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loaderScreen = document.getElementById('loader-screen');
+            const mainContent = document.getElementById('main-content');
+            const percentageText = document.getElementById('loader-percentage');
+            const loaderBar = document.getElementById('loader-bar');
+            
+            let progress = 0;
+            
+            const DURATION = 4000; // 4 seconds
+            const startTime = performance.now();
+            
+            const updateProgress = (currentTime) => {
+                const elapsed = currentTime - startTime;
+                progress = Math.min((elapsed / DURATION) * 100, 100);
+                
+                percentageText.textContent = Math.floor(progress);
+                loaderBar.style.width = `${progress}%`;
+                
+                if (progress < 100) {
+                    requestAnimationFrame(updateProgress);
+                } else {
+                    setTimeout(completeLoading, 500);
+                }
+            };
+            
+            const completeLoading = () => {
+                loaderScreen.classList.add('hidden');
+                mainContent.style.display = 'block';
+                
+                // Staggered Reveal of Children
+                setTimeout(() => {
+                    const revealItems = document.querySelectorAll('.reveal-item');
+                    revealItems.forEach((item, index) => {
+                        setTimeout(() => {
+                            item.classList.add('show');
+                        }, index * 100); // Slightly faster staggered delay (100ms)
+                    });
+                }, 100);
+
+                setTimeout(() => {
+                    loaderScreen.style.display = 'none';
+                }, 900);
+            };
+            
+            requestAnimationFrame(updateProgress);
+        });
+
+        // Theme Toggle Logic
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const html = document.documentElement;
+
+        const getPreferredTheme = () => {
+            const saved = localStorage.getItem('theme');
+            if (saved) return saved;
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
+
+        const setTheme = (theme) => {
+            html.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+        };
+
+        themeToggle.addEventListener('click', () => {
+            const current = html.getAttribute('data-theme') || getPreferredTheme();
+            setTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        // Initialize
+        setTheme(getPreferredTheme());
+    </script>
+    {% block extra_js %}{% endblock %}
+
+    {% include 'chatbot.html' %}
+    <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/chatbot.js' %}"></script>
+</body>
+</html>

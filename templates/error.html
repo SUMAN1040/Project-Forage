@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card" style="text-align: center; display: flex; flex-direction: column; gap: 24px">
+    <div style="font-size: 4rem">⚠️</div>
+    <h2>Oops! Something went wrong</h2>
+    <p class="badge-error">{{ error }}</p>
+    <div>
+        <a href="{% url 'home' %}" class="btn-primary">🏠 Back to Home</a>
+    </div>
+</div>
+{% endblock %}

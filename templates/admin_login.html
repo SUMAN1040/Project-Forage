@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="min-height: 60vh; display: flex; align-items: center; justify-content: center;">
+    <div class="card animate-fade-in" style="max-width: 448px; width: 100%; display: flex; flex-direction: column; gap: 24px;">
+        <div style="text-align: center;">
+            <div style="font-size: 3.5rem; margin-bottom: 12px;">🔐</div>
+            <h1 style="font-size: 1.5rem; font-weight: 700;">Admin Login</h1>
+            <p style="font-size: 14px; color: var(--secondary); margin-top: 4px;">Authorized access only</p>
+        </div>
+
+        <form id="login-form" style="display: flex; flex-direction: column; gap: 16px;">
+            {% csrf_token %}
+            <div>
+                <label style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--foreground);">Username</label>
+                <input type="text" id="username" class="input-field" placeholder="Enter username" required autocomplete="username">
+            </div>
+
+            <div>
+                <label style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--foreground);">Password</label>
+                <input type="password" id="password" class="input-field" placeholder="Enter password" required autocomplete="current-password">
+            </div>
+
+            <div id="login-error" class="badge-error" style="text-align: center; display: none;"></div>
+
+            <button type="submit" id="btn-login" class="btn-primary" style="width: 100%;">🔑 Login</button>
+        </form>
+
+        <div style="text-align: center;">
+            <a href="{% url 'home' %}" class="link-subtle">← Back to Home</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btn-login');
+        const err = document.getElementById('login-error');
+        btn.disabled = true;
+        btn.textContent = '🔄 Logging in...';
+        err.style.display = 'none';
+
+        try {
+            const response = await fetch('/api/admin/login/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    username: document.getElementById('username').value,
+                    password: document.getElementById('password').value
+                })
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Login failed');
+            window.location.reload();
+        } catch (err_msg) {
+            err.textContent = err_msg.message;
+            err.style.display = 'block';
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '🔑 Login';
+        }
+    });
+</script>
+{% endblock %}

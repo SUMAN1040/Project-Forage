@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+{% csrf_token %}
+<div class="animate-fade-in" style="display: flex; flex-direction: column; gap: 48px; padding-bottom: 60px;">
+    <!-- Hero Section -->
+    <div class="reveal-item hero-section" style="text-align: center; padding: 40px 0 20px 0;">
+        <h1 style="font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; margin-bottom: 16px; background: linear-gradient(135deg, var(--foreground), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;">
+            Project Forage
+        </h1>
+        <p style="color: var(--secondary); max-width: 600px; margin: 0 auto; font-size: 1.1rem; line-height: 1.6;">
+            Share text, code, and files securely with automatic deletion after 10 minutes. 
+            <span style="display: block; font-size: 0.9rem; margin-top: 12px; opacity: 0.8; font-weight: 500;">
+                No signup • Auto-delete • Max 700KB
+            </span>
+        </p>
+    </div>
+
+    <!-- Tabs Area -->
+    <div class="reveal-item tabs-container">
+        <button id="tab-create" class="tab-button active"><span>✏️</span><span class="tab-label">Create</span></button>
+        <button id="tab-retrieve" class="tab-button inactive"><span>🔍</span><span class="tab-label">Retrieve</span></button>
+        <button id="tab-history" class="tab-button inactive"><span>🕒</span><span class="tab-label">History</span></button>
+    </div>
+
+    <!-- Main Container for Transitions -->
+    <div class="reveal-item" style="position: relative; min-height: 400px;">
+
+        <!-- Create Section -->
+        <div id="section-create" class="card" style="display: flex; flex-direction: column; gap: 24px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);">
+            <div style="display: flex; justify-content: center; gap: 12px;">
+                <button id="type-text" class="type-button active">📝 Text</button>
+                <button id="type-file" class="type-button inactive">📎 File</button>
+            </div>
+
+            <!-- Text Input -->
+            <div id="input-text-container">
+                <textarea id="text-value" placeholder="Paste your text or code here..." class="input-field" style="height: 240px; resize: none; font-family: 'Courier New', monospace;"></textarea>
+            </div>
+
+            <!-- File Input -->
+            <div id="input-file-container" style="display: none">
+                <div id="drop-zone" class="drop-zone">
+                    <input type="file" id="file-input" style="display: none">
+                    <div style="padding: 20px;">
+                        <p id="drop-icon" style="font-size: 3.5rem; margin-bottom: 16px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.1));">📁</p>
+                        <p id="file-name" style="font-weight: 600; font-size: 1.1rem;">Click to upload or drag & drop</p>
+                        <p style="font-size: 0.9rem; color: var(--secondary); margin-top: 8px">Max 700KB • Text, PDF, Docs</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="create-error" class="badge-error" style="text-align: center; display: none; padding: 12px; border-radius: 12px;"></div>
+
+            <button id="btn-generate" class="btn-primary" style="width: 100%; font-size: 1.1rem; height: 56px;">Generate Secure Link</button>
+
+            <!-- Result Box -->
+            <div id="create-result" class="result-box" style="display: none; flex-direction: column; gap: 20px; animation: slideInUp 0.5s ease-out;">
+                <div>
+                    <p style="font-weight: 600; margin-bottom: 12px; font-size: 0.9rem; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.05em;">🔗 Share Link</p>
+                    <div class="result-pair-stack" style="display: flex; gap: 12px">
+                        <input type="text" id="result-link" readonly class="input-field" style="font-size: 14px; background: rgba(255,255,255,0.5);">
+                        <button id="btn-copy-link" class="btn-secondary" style="min-width: 100px;">📋 Copy Link</button>
+                    </div>
+                </div>
+                <div>
+                    <p style="font-weight: 600; margin-bottom: 12px; font-size: 0.9rem; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.05em;">🔢 Retrieval Code</p>
+                    <div class="result-pair-stack" style="display: flex; gap: 12px">
+                        <input type="text" id="result-code" readonly class="input-field" style="text-align: center; font-family: monospace; font-size: 1.5rem; letter-spacing: 0.15em; font-weight: 700; color: var(--primary); background: rgba(255,255,255,0.5);">
+                        <button id="btn-copy-code" class="btn-secondary" style="min-width: 100px;">📋 Copy Code</button>
+                    </div>
+                </div>
+                <div style="text-align: center; padding-top: 10px; border-top: 1px solid var(--border);">
+                    <p style="font-size: 0.9rem; color: var(--secondary); margin-bottom: 8px;">⏳ This link will expire in:</p>
+                    <p id="create-countdown" class="countdown">10:00</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Retrieve Section -->
+        <div id="section-retrieve" class="card" style="display: none; flex-direction: column; gap: 24px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);">
+            <div>
+                <label style="font-weight: 600; display: block; margin-bottom: 12px; font-size: 1.1rem;">Enter Retrieval Code</label>
+                <input type="text" id="retrieve-code" placeholder="e.g. X7K9P2" class="input-field" style="text-align: center; font-family: monospace; font-size: 1.8rem; letter-spacing: 0.2em; text-transform: uppercase; padding: 20px;" maxlength="6">
+            </div>
+
+            <button id="btn-retrieve" class="btn-primary" style="width: 100%; height: 56px; font-size: 1.1rem;">🔍 Retrieve Content</button>
+
+            <div id="retrieve-error" class="badge-error" style="text-align: center; display: none; padding: 12px; border-radius: 12px;"></div>
+
+            <div id="retrieve-result" class="result-box" style="display: none; flex-direction: column; gap: 24px; animation: slideInUp 0.5s ease-out;">
+                <div style="text-align: center; padding-bottom: 20px; border-bottom: 1px solid var(--border);">
+                    <p style="font-size: 0.9rem; color: var(--secondary); margin-bottom: 8px;">⏳ Time remaining:</p>
+                    <p id="retrieve-countdown" class="countdown">--:--</p>
+                </div>
+
+                <!-- Content Area -->
+                <div id="retrieve-content-text" style="display: none">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px">
+                        <span style="font-weight: 700; color: var(--foreground);">📝 Content</span>
+                        <button id="btn-copy-content" class="btn-secondary" style="padding: 8px 16px; font-size: 14px;">📋 Copy All</button>
+                    </div>
+                    <div class="content-preview" style="background: rgba(255,255,255,0.3); border-radius: 12px; padding: 1px; border: 1px solid var(--border); overflow: hidden;">
+                        <textarea id="display-text" readonly class="input-field" style="height: 400px; resize: none; border: none; background: transparent; font-family: 'JetBrains Mono', 'Fira Code', monospace; padding: 20px;"></textarea>
+                    </div>
+                </div>
+
+                <div id="retrieve-content-file" style="display: none; text-align: center; padding: 20px;">
+                    <div style="width: 80px; height: 80px; background: var(--primary); color: #fff; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 2.5rem; box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2);">📄</div>
+                    <p id="display-file-name" style="font-weight: 700; font-size: 1.25rem; margin-bottom: 4px;"></p>
+                    <p id="display-file-size" style="font-size: 0.95rem; color: var(--secondary);"></p>
+                    <button id="btn-download" class="btn-primary" style="margin-top: 24px; width: 100%;">⬇️ Download File</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Section -->
+        <div id="section-history" class="card" style="display: none; flex-direction: column; gap: 24px; transition: all 0.4s ease;">
+            <div style="text-align: center; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
+                <h2 style="font-size: 1.5rem; font-weight: 700; margin: 0;">Recent History</h2>
+                <p style="color: var(--secondary); font-size: 0.9rem; margin: 4px 0 0 0;">Your active clips (last 10 mins)</p>
+            </div>
+            
+            <div id="history-list" class="history-list">
+                <p class="empty-msg">No active clips found in history.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+
+    <div class="features-grid reveal-item">
+        <div class="feature-card">
+            <div class="feature-icon">🛡️</div>
+            <h3 class="feature-title">Fully Private</h3>
+            <p class="feature-description">No logs, no tracking. Your data is encrypted and deleted permanently after 10 mins.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3 class="feature-title">Instant Sharing</h3>
+            <p class="feature-description">Paste text or upload files and get a shareable link or code instantly.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">⌛</div>
+            <h3 class="feature-title">Self-Destruct</h3>
+            <p class="feature-description">Automatic deletion ensures your shared items don't stay on the web forever.</p>
+        </div>
+    </div>
+
+    <div class="reveal-item" style="text-align: center; margin-top: 20px;">
+        <a href="/admin" class="link-subtle" style="font-weight: 500;">🔐 Admin Access</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}

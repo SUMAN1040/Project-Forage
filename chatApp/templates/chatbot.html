@@ -1,0 +1,35 @@
+<!-- AI-Mate Chatbot -->
+<div id="ai-mate-container" class="ai-mate-container">
+    <!-- Floating Toggle -->
+    <button id="ai-mate-toggle" class="ai-mate-toggle" title="Chat with AI-Mate">
+        <span class="ai-mate-icon pulse-emerald">🤖</span>
+        <span class="ai-mate-label">AI-Mate</span>
+    </button>
+
+    <!-- Chat Window -->
+    <div id="ai-mate-window" class="ai-mate-window" style="display: none;">
+        <div class="ai-mate-header">
+            <div class="header-info">
+                <span class="status-dot"></span>
+                <h3>AI-Mate</h3>
+            </div>
+            <button id="ai-mate-close" class="ai-mate-close" title="Close">✕</button>
+        </div>
+        <div id="ai-mate-messages" class="ai-mate-messages">
+            <div class="chat-message bot">
+                <div class="message-bubble">
+                    Hello! I'm AI-Mate. How can I help you today?
+                </div>
+            </div>
+        </div>
+        <div class="ai-mate-input-area">
+            <textarea id="ai-mate-input" placeholder="Ask anything..." autocomplete="off" rows="1"></textarea>
+            <button id="ai-mate-send" class="btn-send">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>

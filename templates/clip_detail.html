@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card" style="display: flex; flex-direction: column; gap: 24px">
+    <div style="text-align: center">
+        <h2>🔐 Secure Clip</h2>
+        <p style="color: var(--secondary)">This clip was shared directly with you.</p>
+    </div>
+
+    {% if clip.type == 'text' %}
+    <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px">
+            <span style="font-weight: 500">📝 Text Content</span>
+            <button id="btn-copy-content" class="btn-secondary" style="padding: 6px 12px; font-size: 13px">📋 Copy</button>
+        </div>
+        <div class="content-preview">
+            <pre id="display-text">{{ clip.content }}</pre>
+        </div>
+    </div>
+    {% else %}
+    <div style="text-align: center">
+        <p style="font-size: 3rem; margin-bottom: 8px">📄</p>
+        <p style="font-weight: 500; font-size: 1.1rem">{{ clip.fileName }}</p>
+        <p style="font-size: 13px; color: var(--secondary); margin-top: 4px">{{ clip.fileSize|filesizeformat }}</p>
+        <button id="btn-download" class="btn-primary" style="margin-top: 16px">⬇️ Download File</button>
+    </div>
+    {% endif %}
+
+    <div style="text-align: center; margin-top: 16px">
+        <a href="{% url 'home' %}" class="btn-secondary">🏠 Back to Home</a>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const btnCopy = document.getElementById('btn-copy-content');
+        if (btnCopy) {
+            btnCopy.addEventListener('click', () => {
+                const text = document.getElementById('display-text').textContent;
+                navigator.clipboard.writeText(text).then(() => alert('✅ Copied!'));
+            });
+        }
+
+        const btnDownload = document.getElementById('btn-download');
+        if (btnDownload) {
+            btnDownload.addEventListener('click', () => {
+                const content = "{{ clip.content }}";
+                const fileName = "{{ clip.fileName }}";
+                const fileType = "{{ clip.fileType }}";
+                const link = document.createElement('a');
+                link.href = `data:${fileType};base64,${content}`;
+                link.download = fileName;
+                link.click();
+            });
+        }
+    });
+</script>
+{% endblock %}

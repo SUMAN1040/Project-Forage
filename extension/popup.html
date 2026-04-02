@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Forage</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body style="width: 400px; height: 500px; margin: 0; padding: 0;">
+    <div class="extension-container">
+        <header>
+            <div class="header-top">
+                <h1>Project Forage</h1>
+                <img src="icons/globe.png" id="link-website" class="icon-globe" title="Go to Website">
+            </div>
+            <p>Secure Sharing</p>
+        </header>
+
+        <div class="tabs">
+            <button id="tab-create" class="tab-button active">✏️ Create</button>
+            <button id="tab-retrieve" class="tab-button inactive">🔍 Retrieve</button>
+            <button id="tab-history" class="tab-button inactive">🕒 History</button>
+        </div>
+
+        <main id="section-create" class="section">
+            <div class="input-group">
+                <textarea id="text-value" placeholder="Paste text or code here..." class="input-field"></textarea>
+            </div>
+            <button id="btn-generate" class="btn-primary">Generate Link</button>
+            
+            <div id="create-result" class="result-box" style="display: none;">
+                <input type="text" id="result-link" readonly class="input-field-small">
+                <input type="text" id="result-code" readonly class="input-field-code">
+                <p id="create-countdown" class="countdown-small">10:00</p>
+            </div>
+        </main>
+
+        <main id="section-retrieve" class="section section-grow" style="display: none;">
+            <div class="input-group">
+                <input type="text" id="retrieve-code" placeholder="Enter Code" class="input-field-code">
+            </div>
+            <button id="btn-retrieve" class="btn-primary">🔍 Retrieve Content</button>
+            <div id="retrieve-result" class="result-box-grow" style="display: none;">
+                <div id="retrieve-content-text" style="display: none; height: 100%;">
+                    <textarea id="display-text" readonly class="input-field-grow"></textarea>
+                </div>
+                <div id="retrieve-content-file" class="file-display-box" style="display: none;">
+                    <div class="file-info-icon">📁</div>
+                    <div class="file-details">
+                        <span id="display-file-name" class="file-name-text">filename.ext</span>
+                        <span id="display-file-size" class="file-size-text">0.0 KB</span>
+                    </div>
+                    <button id="btn-download" class="btn-download">
+                        📥 Download File
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <main id="section-history" class="section" style="display: none;">
+            <div id="history-list" class="history-list">
+                <p class="empty-msg">No active links in history.</p>
+            </div>
+        </main>
+        
+        <div id="status-error" class="error-msg" style="display: none;"></div>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>
