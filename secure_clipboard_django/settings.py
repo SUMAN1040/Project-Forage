@@ -5,8 +5,13 @@ from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load environment variables from .env
-load_dotenv(BASE_DIR / '.env')
+# Load environment variables from .env if it exists
+env_path = BASE_DIR / '.env'
+if env_path.exists():
+    load_dotenv(env_path)
+else:
+    # On Vercel, variables are loaded from the environment directly
+    pass
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -17,7 +22,7 @@ SECRET_KEY = os.getenv('SESSION_SECRET', 'django-insecure-$-hn2-+3^p+q0zr69_721g
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.vercel.app', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['*'] # Set to '*' temporarily to debug Vercel deployment
 
 
 # Application definition
