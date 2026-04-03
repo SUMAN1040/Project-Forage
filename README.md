@@ -1,28 +1,19 @@
 # Project-Forage
 
-A Django-based application for secure clipboard management.
+Project-Forage is a secure and intelligent application ecosystem designed for modern clipboard management and AI-assisted interactions. Built with Django, it provides a robust backend for handling sensitive data while integrating cutting-edge AI capabilities.
 
-## Environment Setup
+## Key Features
 
-To keep this project secure, sensitive information like API keys and database credentials are stored in a `.env` file. 
+- **Secure Clipboard Management**: Safely store and manage your clipboard history with encrypted data handling.
+- **AI-Mate Integration**: A built-in intelligent chatbot powered by Google Gemini API to assist with project tasks and information retrieval.
+- **Cross-Platform Readiness**: Includes configurations for browser extension integration, allowing for seamless use within your workflow.
+- **Fast Performance**: Utilizes Upstash Redis for high-performance data operations and caching.
+- **Modern Infrastructure**: Fully container-ready and designed for easy deployment with modern cloud services.
 
-### Important Note on Security
-- The `.env` file is **ignored** by Git and will not be pushed to GitHub.
-- If you are setting up this project for the first time, you must create your own `.env` file based on the environment variables required by `settings.py`.
+## Technical Stack
 
-## Git Management
-
-### Ignoring and Removing Files
-If a folder (like `library-solidity/`) was already pushed to GitHub but needs to be removed and ignored:
-
-1.  **Add to `.gitignore`**: Add the folder name to the `.gitignore` file.
-2.  **Remove from Git Cache**: Run the following command to remove the folder from Git tracking *without* deleting the local files:
-    ```bash
-    git rm -r --cached library-solidity/
-    ```
-3.  **Commit and Push**: Stage the changes, commit, and push to GitHub:
-    ```bash
-    git add .gitignore
-    git commit -m "Remove tracked folder and update .gitignore"
-    git push origin main
-    ```
+- **Backend**: Django (Python)
+- **Database**: SQLite (Development) / Upstash Redis
+- **AI Engine**: Google Gemini API
+- **Frontend**: HTML5, Vanilla CSS, JavaScript
+- **Security**: Environment-based configuration, CORS protection, and secure session management.
