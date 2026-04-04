@@ -9,6 +9,7 @@ urlpatterns = [
     
     # Admin
     path('admin/', admin_views.admin_dashboard_view, name='admin_dashboard'),
+    path('admin/logout/', admin_views.admin_logout_view, name='admin_logout'),
     path('api/admin/login/', admin_views.admin_login_api, name='admin_login_api'),
     path('api/admin/send/', admin_views.admin_send_api, name='admin_send_api'),
 ]

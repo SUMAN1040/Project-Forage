@@ -152,8 +152,7 @@
         });
 
         document.getElementById('btn-logout').addEventListener('click', () => {
-            document.cookie = "admin_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            window.location.href = '/';
+            window.location.href = "{% url 'admin_logout' %}";
         });
 
         function getCookie(name) {
